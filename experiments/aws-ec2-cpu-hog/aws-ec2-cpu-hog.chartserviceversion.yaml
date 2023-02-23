@@ -1,0 +1,26 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: aws-ec2-cpu-hog
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: ""
+  displayName: aws-ec2-cpu-hog
+  experiments: null
+  faults:
+  - description: ""
+    displayName: ""
+    name: windows-ec2-cpu-hog-z8g
+  keywords: []
+  provider:
+    name: ""
+  scenarios: null
