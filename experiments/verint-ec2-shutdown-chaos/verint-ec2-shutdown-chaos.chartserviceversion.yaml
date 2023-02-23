@@ -1,0 +1,26 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: verint-ec2-shutdown-chaos
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: It inject ec2 shutdown chaos on verint machine
+  displayName: verint-ec2-shutdown-chaos
+  experiments: null
+  faults:
+  - description: ""
+    displayName: ""
+    name: ec2-stop-by-id-5s7
+  keywords: []
+  provider:
+    name: ""
+  scenarios: null
