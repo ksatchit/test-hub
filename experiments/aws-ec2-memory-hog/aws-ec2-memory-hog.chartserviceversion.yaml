@@ -13,7 +13,7 @@ packageInfo:
   experiments: null
   packageName: ""
 spec:
-  categoryDescription: aws-ec2-memory-hog
+  categoryDescription: aws-ec2-windows-memory-hog
   displayName: aws-ec2-memory-hog
   experiments: null
   faults:
