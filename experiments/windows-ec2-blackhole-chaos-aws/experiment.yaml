@@ -1,0 +1,284 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  creationTimestamp: null
+  labels:
+    subject: windows-ec2-blackhole-chaos_litmus
+  name: windows-ec2-blackhole-chaos-aws
+  namespace: hce
+spec:
+  arguments:
+    parameters:
+    - name: adminModeNamespace
+      value: hce
+  entrypoint: custom-chaos
+  podGC:
+    strategy: OnWorkflowCompletion
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: argo-chaos
+  templates:
+  - inputs: {}
+    metadata: {}
+    name: custom-chaos
+    outputs: {}
+    steps:
+    - - arguments: {}
+        name: install-chaos-faults
+        template: install-chaos-faults
+    - - arguments: {}
+        name: windows-ec2-blackhole-chaos-z8g
+        template: windows-ec2-blackhole-chaos-z8g
+    - - arguments: {}
+        name: cleanup-chaos-resources
+        template: cleanup-chaos-resources
+  - container:
+      args:
+      - kubectl apply -f /tmp/windows-ec2-blackhole-chaos-z8g.yaml -n {{workflow.parameters.adminModeNamespace}}
+        &&  sleep 30
+      command:
+      - sh
+      - -c
+      image: docker.io/chaosnative/k8s:2.13.0
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: windows-ec2-blackhole-chaos-z8g
+        path: /tmp/windows-ec2-blackhole-chaos-z8g.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            description:
+              message: |
+                It injects DNS error chaos on EC2 instance for a certain chaos duration
+            kind: ChaosExperiment
+            metadata:
+              name: windows-ec2-blackhole-chaos
+              labels:
+                name: windows-ec2-blackhole-chaos
+                app.kubernetes.io/part-of: litmus
+                app.kubernetes.io/component: chaosexperiment
+                app.kubernetes.io/version: ci
+            spec:
+              definition:
+                scope: Namespaced
+                permissions:
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods
+                    verbs:
+                      - create
+                      - delete
+                      - get
+                      - list
+                      - patch
+                      - update
+                      - deletecollection
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - events
+                    verbs:
+                      - create
+                      - get
+                      - list
+                      - patch
+                      - update
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - configmaps
+                    verbs:
+                      - get
+                      - list
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods/log
+                    verbs:
+                      - get
+                      - list
+                      - watch
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods/exec
+                    verbs:
+                      - get
+                      - list
+                      - create
+                  - apiGroups:
+                      - apps
+                    resources:
+                      - deployments
+                      - statefulsets
+                      - replicasets
+                      - daemonsets
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - apps.openshift.io
+                    resources:
+                      - deploymentconfigs
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - replicationcontrollers
+                    verbs:
+                      - get
+                      - list
+                  - apiGroups:
+                      - argoproj.io
+                    resources:
+                      - rollouts
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - batch
+                    resources:
+                      - jobs
+                    verbs:
+                      - create
+                      - list
+                      - get
+                      - delete
+                      - deletecollection
+                  - apiGroups:
+                      - litmuschaos.io
+                    resources:
+                      - chaosengines
+                      - chaosexperiments
+                      - chaosresults
+                    verbs:
+                      - create
+                      - list
+                      - get
+                      - patch
+                      - update
+                      - delete
+                image: chaosnative/go-runner:3.0.3-saas
+                imagePullPolicy: Always
+                args:
+                  - -c
+                  - ./experiments -name ec2-blackhole-chaos
+                command:
+                  - /bin/bash
+                env:
+                  - name: TOTAL_CHAOS_DURATION
+                    value: "60"
+                  - name: EC2_INSTANCE_ID
+                    value: ''
+                  - name: EC2_INSTANCE_TAGS
+                    value: ""
+                  - name: IP_ADDRESSES
+                    value: ""
+                  - name: DESTINATION_HOSTS
+                    value: ""
+                  - name: REGION
+                    value: ''
+                  - name: RAMP_TIME
+                    value: ""
+                  - name: AWS_SHARED_CREDENTIALS_FILE
+                    value: /tmp/cloud_config.yml
+                labels:
+                  name: windows-ec2-blackhole-chaos
+                  app.kubernetes.io/part-of: litmus
+                  app.kubernetes.io/component: experiment-job
+                  app.kubernetes.io/version: ci
+                secrets:
+                  - name: cloud-secret
+                    mountPath: /tmp/
+    metadata: {}
+    name: install-chaos-faults
+    outputs: {}
+  - container:
+      args:
+      - -file=/tmp/chaosengine-windows-ec2-blackhole-chaos-z8g.yaml
+      - -saveName=/tmp/engine-name
+      image: chaosnative/litmus-checker:2.11.0
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: windows-ec2-blackhole-chaos-z8g
+        path: /tmp/chaosengine-windows-ec2-blackhole-chaos-z8g.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            kind: ChaosEngine
+            metadata:
+              namespace: "{{workflow.parameters.adminModeNamespace}}"
+              generateName: windows-ec2-blackhole-chaos-z8g
+              labels:
+                instance_id: 1f46056e-719d-47c9-834e-95f8b5143621
+                workflow_name: windows-ec2-blackhole-chaos-aws
+                workflow_run_id: "{{ workflow.uid }}"
+            spec:
+              engineState: active
+              chaosServiceAccount: litmus-admin
+              experiments:
+                - name: windows-ec2-blackhole-chaos
+                  spec:
+                    components:
+                      env:
+                        - name: TOTAL_CHAOS_DURATION
+                          value: "60"
+                        - name: REGION
+                          value: us-east-1
+                        - name: EC2_INSTANCE_ID
+                          value: i-02ce7a4aa02ac58e5
+                        - name: EC2_INSTANCE_TAGS
+                          value: ""
+                        - name: IP_ADDRESSES
+                          value: ""
+                        - name: DESTINATION_HOSTS
+                          value: a8410fd1b9b1a4bb5bded85dd0f6bced-1150883503.us-east-1.elb.amazonaws.com
+                        - name: SEQUENCE
+                          value: parallel
+                    probe:
+                      - name: healthcheck
+                        type: cmdProbe
+                        mode: Edge
+                        runProperties:
+                          probeTimeout: 10
+                          retry: 0
+                          interval: 1
+                          stopOnFailure: true
+                        cmdProbe/inputs:
+                          command: ./healthcheck -name aws-ec2
+                          source:
+                            image: chaosnative/go-runner:3.0.3-saas
+                            inheritInputs: true
+                          comparator:
+                            type: string
+                            criteria: contains
+                            value: "[P000]"
+    metadata:
+      labels:
+        weight: "10"
+    name: windows-ec2-blackhole-chaos-z8g
+    outputs: {}
+  - container:
+      args:
+      - kubectl delete chaosengine -l workflow_run_id={{workflow.uid}} -n {{workflow.parameters.adminModeNamespace}}
+      command:
+      - sh
+      - -c
+      image: docker.io/chaosnative/k8s:2.13.0
+      name: ""
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: cleanup-chaos-resources
+    outputs: {}
+status:
+  finishedAt: null
+  startedAt: null
