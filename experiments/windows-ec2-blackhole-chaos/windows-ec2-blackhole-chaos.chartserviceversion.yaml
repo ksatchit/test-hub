@@ -1,0 +1,27 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: windows-ec2-blackhole-chaos
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: Injects blackhole chaos on an AWS windows EC2 instance for
+    a specified chaos duration
+  displayName: windows-ec2-blackhole-chaos
+  experiments: null
+  faults:
+  - description: ""
+    displayName: ""
+    name: windows-ec2-blackhole-chaos-z8g
+  keywords: []
+  provider:
+    name: ""
+  scenarios: null
