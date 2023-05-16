@@ -1,0 +1,26 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: kill-pod-boutique
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: ""
+  displayName: kill-pod-boutique
+  experiments: null
+  faults:
+  - description: ""
+    displayName: ""
+    name: pod-delete-bie
+  keywords: []
+  provider:
+    name: ""
+  scenarios: null
