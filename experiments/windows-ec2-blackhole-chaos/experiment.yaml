@@ -234,13 +234,13 @@ spec:
                         - name: REGION
                           value: us-east-1
                         - name: EC2_INSTANCE_ID
-                          value: i-02ce7a4aa02ac58e5
+                          value: i-075fbb193be242dd6
                         - name: EC2_INSTANCE_TAGS
                           value: ""
                         - name: IP_ADDRESSES
-                          value: 44.202.214.108
+                          value: ""
                         - name: DESTINATION_HOSTS
-                          value: a8410fd1b9b1a4bb5bded85dd0f6bced-1150883503.us-east-1.elb.amazonaws.com
+                          value: http://localhost:8080/
                         - name: SEQUENCE
                           value: parallel
                     probe:
