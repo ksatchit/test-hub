@@ -9,7 +9,7 @@ spec:
     parameters:
     - name: adminModeNamespace
       value: hce
-  entrypoint: kill-pod-prometheus
+  entrypoint: kill-pod
   podGC:
     strategy: OnWorkflowCompletion
   securityContext:
@@ -19,15 +19,15 @@ spec:
   templates:
   - inputs: {}
     metadata: {}
-    name: kill-pod-prometheus
+    name: kill-pod
     outputs: {}
     steps:
     - - arguments: {}
         name: install-chaos-faults
         template: install-chaos-faults
     - - arguments: {}
-        name: pod-delete-bie
-        template: pod-delete-bie
+        name: pod-delete-4qk
+        template: pod-delete-4qk
     - - arguments: {}
         name: cleanup-chaos-resources
         template: cleanup-chaos-resources
@@ -43,8 +43,8 @@ spec:
       resources: {}
     inputs:
       artifacts:
-      - name: pod-delete-bie
-        path: /tmp/pod-delete-bie.yaml
+      - name: pod-delete-4qk
+        path: /tmp/pod-delete-4qk.yaml
         raw:
           data: |
             apiVersion: litmuschaos.io/v1alpha1
@@ -213,15 +213,15 @@ spec:
     outputs: {}
   - container:
       args:
-      - -file=/tmp/chaosengine-pod-delete-bie.yaml
+      - -file=/tmp/chaosengine-pod-delete-4qk.yaml
       - -saveName=/tmp/engine-name
       image: chaosnative/litmus-checker:2.11.0
       name: ""
       resources: {}
     inputs:
       artifacts:
-      - name: pod-delete-bie
-        path: /tmp/chaosengine-pod-delete-bie.yaml
+      - name: pod-delete-4qk
+        path: /tmp/chaosengine-pod-delete-4qk.yaml
         raw:
           data: |
             apiVersion: litmuschaos.io/v1alpha1
@@ -230,8 +230,8 @@ spec:
               namespace: "{{workflow.parameters.adminModeNamespace}}"
               labels:
                 workflow_run_id: "{{ workflow.uid }}"
-                workflow_name: kill-pod-prometheus
-              generateName: pod-delete-bie
+                workflow_name: kill-pod
+              generateName: pod-delete-4qk
             spec:
               appinfo:
                 appns: boutique
@@ -247,7 +247,7 @@ spec:
                         - name: TOTAL_CHAOS_DURATION
                           value: "60"
                         - name: RAMP_TIME
-                          value: "10"
+                          value: "5"
                         - name: FORCE
                           value: "true"
                         - name: CHAOS_INTERVAL
@@ -255,7 +255,7 @@ spec:
                         - name: PODS_AFFECTED_PERC
                           value: ""
                         - name: TARGET_CONTAINER
-                          value: containerd
+                          value: ""
                         - name: TARGET_PODS
                           value: ""
                         - name: DEFAULT_HEALTH_CHECK
@@ -285,7 +285,7 @@ spec:
     metadata:
       labels:
         weight: "10"
-    name: pod-delete-bie
+    name: pod-delete-4qk
     outputs: {}
 status:
   finishedAt: null
